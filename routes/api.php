@@ -34,5 +34,8 @@ Route::prefix('admin')->group(function () {
 
         //Prajas
         Route::apiResource('/praja', App\Http\Controllers\Api\Admin\PrajaController::class);
+
+        //Dosens
+        Route::apiResource('/dosen', App\Http\Controllers\Api\Admin\DosenController::class);
     });
 });

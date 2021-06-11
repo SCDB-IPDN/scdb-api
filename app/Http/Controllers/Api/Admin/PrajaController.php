@@ -34,113 +34,13 @@ class PrajaController extends Controller
             'penempatan',
             'fakultas',
             Praja::raw("substring_index(prodi,' ',1) as jelang_pendidikan"),
-            'prodi',
-
+            Praja::raw("SUBSTRING(prodi, LOCATE(' ' ,prodi)+1) AS prodi")
         )
-            ->when(request()->q, function ($prajas) {
-                $prajas = $prajas->where('nama', 'like', '%' . request()->q . '%');
-            })
-            ->latest('id')
-            ->paginate(10);
+            ->orderBy('nama', 'asc')
+            ->get();
+
 
         //return with Api Resource
         return new PrajaResource(true, 'List Data Praja', $prajas);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nama'     => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        //create praja
-        $praja = Praja::create([
-            'nama' => $request->nama,
-        ]);
-
-        if ($praja) {
-            //return success with Api Resource
-            return new PrajaResource(true, 'Data Praja Berhasil Disimpan!', $praja);
-        }
-
-        //return failed with Api Resource
-        return new PrajaResource(false, 'Data Praja Gagal Disimpan!', null);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $praja = Praja::whereId($id)->first();
-
-        if ($praja) {
-            //return success with Api Resource
-            return new PrajaResource(true, 'Detail Data Praja!', $praja);
-        }
-
-        //return failed with Api Resource
-        return new PrajaResource(false, 'Detail Data Praja Tidak Ditemukan!', null);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Praja $praja)
-    {
-        $validator = Validator::make($request->all(), [
-            'nama'     => 'required|unique:praja,nama,' . $praja->id,
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        //update praja
-        $praja->update([
-            'nama' => $request->name,
-        ]);
-
-        if ($praja) {
-            //return success with Api Resource
-            return new PrajaResource(true, 'Data Praja Berhasil Diupdate!', $praja);
-        }
-
-        //return failed with Api Resource
-        return new PrajaResource(false, 'Data Praja Gagal Diupdate!', null);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Praja $praja)
-    {
-        if ($praja->delete()) {
-            //return success with Api Resource
-            return new PrajaResource(true, 'Data Praja Berhasil Dihapus!', null);
-        }
-
-        //return failed with Api Resource
-        return new PrajaResource(false, 'Data Praja Gagal Dihapus!', null);
     }
 }
